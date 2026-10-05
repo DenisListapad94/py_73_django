@@ -9,10 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
-
-
-
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -39,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     # custom app
     'booking_manager',
 ]
@@ -58,7 +56,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR.parent, "templates/booking_manager")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
