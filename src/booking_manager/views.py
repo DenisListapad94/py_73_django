@@ -1,36 +1,105 @@
-from django.shortcuts import render, HttpResponse
+import time
 
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect,reverse
+
+from booking_manager.forms import BookingForm
+from booking_manager.models import Booking
+from django.conf import settings
+from django.core.cache import caches
+from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+
+from django.db import transaction
+
+from django.views.decorators.cache import cache_page
+from django.urls import reverse_lazy
+from django.views.generic.edit import FormView
+# @cache_page(settings.CACHE_TIMEOUT)
+@transaction.atomic
 def booking(request):
+
+
+    # import time
+    # time.sleep(10)
     template_name = "booking.html"
-    test_go_to_template = 1
-    test_list_to_template = ["python","go","ruby"]
-    test_dict_to_templates = {
-        "Jessi" : {
-            "monday" : "9-18",
-            "tuesday" :  "weekend",
-            "wednesday": '11-19'
-        },
-        "Tom": {
-            "monday": "weekend",
-            "tuesday": "weekend",
-            "wednesday": '9-21'
-        }
-    }
+
+    # Booking.objects.filter(id__gte=4,id__lte=10).select_for_update(skip_locked=True)
+    # print("ho")
+    # for i in range(60):
+    #     print(i)
+    #     time.sleep(1)
+    # raise
+    # import pdb;pdb.set_trace()
+    # raise
     context = {
-        "test1": test_go_to_template,
-        "test_list": test_list_to_template,
-        "peoples": test_dict_to_templates
+        "bookings": Booking.objects.all_optimize()
     }
     return render(request, template_name=template_name,context=context)
 
+class BookingListView(ListView):
+    template_name = "booking.html"
+    model = Booking
+    queryset = Booking.objects.all_optimize()
 
-def about(request):
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context["bookings"] = self.queryset
+    #     return context
+
+
+from django.views import View
+
+
+# class MyView(View):
+#     def get(self, request, *args, **kwargs):
+#         return HttpResponse("<h1>GET HELLO</h1>")
+#
+#     def post(self, request, *args, **kwargs):
+#         return HttpResponse("<h1>POST HELLO</h1>")
+
+# def new_test_view(request):
+#     return HttpResponse("<h1>HELLO</h1>")
+
+
+
+class AboutPageView(TemplateView):
     template_name = "about.html"
+
+# def about(request):
+#     template_name = "about.html"
+#     return render(request, template_name=template_name)
+
+def home(request):
+    template_name = "home.html"
     return render(request, template_name=template_name)
 
-def home(request, home: int):
-    template_name = "home.html"
-    context = {
-        "home": home
-    }
-    return render(request, template_name=template_name, context=context)
+
+
+class BookCreateView(FormView):
+    template_name = "booking_form.html"
+    form_class = BookingForm
+    success_url =  reverse_lazy("book")
+
+
+def book_form(request):
+    template_name = "booking_form.html"
+
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = BookingForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+
+            form.save()
+            # caches["default"].clear()
+            return HttpResponseRedirect(reverse("book"))
+
+    else:
+        form = BookingForm()
+
+    context = { "form": form}
+
+    return render(request, template_name=template_name,context=context)
