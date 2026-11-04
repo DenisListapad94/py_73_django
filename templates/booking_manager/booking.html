@@ -1,9 +1,45 @@
 {% extends "index.html" %}
+{% load cache %}
 
 {% block content %}
 
-<h1>hello booking page {{ test1 }}</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">name</th>
+      <th scope="col">is_active</th>
+      <th scope="col">barber</th>
+        <th scope="col">client</th>
+        <th scope="col">products</th>
+    </tr>
+  </thead>
 
 
+
+
+  <tbody>
+<!--    {% cache 60 sidebar %}-->
+          {% for booking in object_list%}
+    <tr>
+
+      <th >{{booking.id}}</th>
+      <td>{{booking.name}}</td>
+      <td>{{booking.is_active}}</td>
+      <td>{{booking.barber.user.email}}</td>
+      <td>{{booking.client.user.email}}</td>
+
+      <td>
+
+        {% for product in booking.products.all%}
+          <p>{{product.name}}
+       {% endfor %}
+      </td>
+    </tr>
+
+{% endfor %}
+<!--   {% endcache %}-->
+  </tbody>
+</table>
 
 {% endblock %}
