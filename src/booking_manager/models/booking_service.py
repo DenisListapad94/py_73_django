@@ -16,6 +16,7 @@ class BookingService(BaseModel):
     duration_minutes = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
 
+
     class Meta:
         db_table = "booking_services"
         verbose_name = "Услуга"

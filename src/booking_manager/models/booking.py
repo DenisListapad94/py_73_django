@@ -12,7 +12,7 @@ class Booking(BaseModel):
         max_length=30,
         verbose_name="наименование",
         unique=True,
-        validators=[NameValidator()]
+        # validators=[NameValidator]
     )
     is_active = models.BooleanField(
         default=True,
@@ -24,6 +24,7 @@ class Booking(BaseModel):
         blank=True,
         default=datetime.now()
     )
+    photo = models.ImageField(null=True,upload_to="")
 
     booking_service = models.ForeignKey(
         to="BookingService",

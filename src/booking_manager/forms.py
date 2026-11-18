@@ -37,4 +37,4 @@ class BookingForm(forms.ModelForm):
 
     class Meta:
         model = Booking
-        fields = ["name","is_active","visit_time","description"]
+        fields = ["name","is_active","visit_time","description","photo"]

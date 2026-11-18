@@ -8,9 +8,9 @@ from django.conf import settings
 from django.core.cache import caches
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-
+from django.contrib.auth.decorators import permission_required, login_required
 from django.db import transaction
-
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views.decorators.cache import cache_page
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
@@ -69,24 +69,37 @@ class AboutPageView(TemplateView):
 #     template_name = "about.html"
 #     return render(request, template_name=template_name)
 
+
+
+@login_required(login_url="/admin/login")
+# @permission_required(
+#     perm="booking_manager.view_client",
+#     login_url="/admin/login",
+#     raise_exception =True,
+#)
 def home(request):
     template_name = "home.html"
     return render(request, template_name=template_name)
 
 
 
-class BookCreateView(FormView):
+class BookCreateView(LoginRequiredMixin,PermissionRequiredMixin,FormView):
+    login_url="/admin/login"
     template_name = "booking_form.html"
     form_class = BookingForm
     success_url =  reverse_lazy("book")
+    permission_required = "booking_manager.add_booking"
+    redirect_field_name = reverse_lazy("book")
 
 
 def book_form(request):
     template_name = "booking_form.html"
 
     if request.method == "POST":
+
         # create a form instance and populate it with data from the request:
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST,request.FILES)
+
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
